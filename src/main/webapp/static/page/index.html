@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页</title>
+    <script src="/ssm/js/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/ssm/js/vue-resource.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+    <h1>welocme!</h1>
+    <hr />
+    <div id="app">
+        <button type="button" @click="selectList()">查询</button>
+        <table border="1" cellspacing="0">
+            <tr>
+                <td>编号</td>
+                <td>姓名</td>
+                <td>性别</td>
+                <td>出生日期</td>
+                <td>新建时间</td>
+                <td>修改时间</td>
+            </tr>
+            <tr v-for="user in users">
+                <td>{{user.id}}</td>
+                <td>{{user.name}}</td>
+                <td>{{user.gender}}</td>
+                <td>{{user.birthday}}</td>
+                <td>{{user.createTime}}</td>
+                <td>{{user.updateTime}}</td>
+            </tr>
+        </table>
+
+        <input type="hidden" name="id" v-model="user.id"  />
+        姓名:<input type="text" name="name" v-model="user.name" />
+        生日:<input type="date" name="birthday" v-model="user.birthday" />
+        <!--性别:<input type="text" name="gender" v-model="user.gender" />-->
+        性别: <select name="gender" v-model="user.gender">
+                <option value="男">男</option>
+                <option value="女">女</option>
+                <option value="未知">未知</option>
+    </select>
+        <!--<button type="button" @click="update">修改</button>-->
+        <button type="button" @click="insert">新增</button>
+        <button type="button" @click="search">查询</button>
+    </div>
+</body>
+
+<script>
+    var app = new Vue({
+        el: '#app',
+        data:{
+            users:[],
+            user:{}
+        },
+        methods:{
+            selectList:function(){
+                this.$http.get('users').then(function(res){
+                    if(res.body.code == 200){
+                        this.users = res.body.data.list;
+                    }
+                    alert(res.body.msg);
+                }),function(){
+                    console.log('失败');
+                }
+            },
+            insert:function () {
+                alert("前端方法有问题,使用RestClient进行验证!");
+                // var userVar = this.user;
+                // this.$http.post('users',userVar,{emulateJSON:true,contentType: "application/json;charset=UTF-8"}).then(function(){
+                //     if(res.body.code == 200){
+                //         this.selectList();
+                //     }
+                //     alert(res.body.msg);
+                // }),function(){
+                //     console.log('失败');
+                // }
+            },
+            search:function () {
+                this.$http.get('users?id=&name='+this.user.name+'&gender='+this.user.gender + '&birthday='+this.user.birthday).then(function(res){
+                    if(res.body.code == 200){
+                        this.users = res.body.data.list;
+                    }
+                    alert(res.body.msg);
+                }),function(){
+                    console.log('失败');
+                }
+            }
+        }
+    });
+</script>
+</html>

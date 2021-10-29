@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.reacher.mapper.IUserMapper">
+
+    <select id="selectAllUsers" resultMap="userMap">
+        select id,name,gender,birthday,create_time,update_time from user_info
+        <where>
+            <if test="id != null and id != ''">
+                and id  = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name like '%' #{name} '%'
+            </if>
+            <if test="gender != null and gender != ''">
+                and gender = #{gender}
+            </if>
+            <if test="birthday != null">
+                and birthday = #{birthday}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertUser">
+        <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE">
+            select REPLACE(UUID(),'-','') from dual
+        </selectKey>
+        insert into USER_INFO(id,name,gender,birthday,active_flag) values(#{id},#{name},#{gender},#{birthday},'0')
+    </insert>
+
+    <select id="selectOneUser" resultMap="userOrderMap">
+        select ui.id as uid, ui.name, ui.gender ,ui.birthday ,ui.create_time ,ui.update_time , oi.userid as userid, oi.id  as oid, oi.businesssum ,oi.paytime
+        from user_info ui left join order_info oi on ui.id = oi.userid where ui.id = #{userId}
+</select>
+    
+    <resultMap id="userMap" type="User">
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="userOrderMap" type="User">
+        <id column="uid" property="id"/>
+        <result column="name" property="name"/>
+        <result column="gender" property="gender"/>
+        <result column="birthday" property="birthday"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <collection property="orders" ofType="Order">
+            <id column="oid" property="id" />
+            <result column="businesssum" property="businessSum"/>
+            <result column="paytime" property="payTime"/>
+        </collection>
+    </resultMap>
+
+</mapper>
